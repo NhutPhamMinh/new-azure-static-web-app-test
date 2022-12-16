@@ -19,6 +19,7 @@ jobs:
       - name: workflow info
         run: |
           echo "Main Workflow"
+          az version
       - uses: actions/checkout@v2
         with:
           submodules: true
