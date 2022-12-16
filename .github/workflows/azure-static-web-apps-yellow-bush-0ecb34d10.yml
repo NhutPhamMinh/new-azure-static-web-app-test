@@ -8,12 +8,15 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened, closed]
   delete:
-    branches: [main, testing, feature/*]
+    branches: [testdelete]
 jobs:
   build_and_deploy_job:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
+      - name: workflow info
+        run: |
+          echo "Main Workflow"
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -44,4 +47,6 @@ jobs:
       - name: 'Delete Branch'
         if: github.event_name == 'delete'
         run: |
+          echo "GITHUB_SHA is ${{ github.sha }}"
           echo "GITHUB_REF is ${{ github.ref }}"
+          echo "${{ github.event.ref }} - ${{ github.event.ref_type }}"
