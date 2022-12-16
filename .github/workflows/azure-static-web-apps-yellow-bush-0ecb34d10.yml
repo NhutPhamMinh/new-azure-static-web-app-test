@@ -51,6 +51,7 @@ jobs:
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
           az staticwebapp environment list --name pmn-test-static-web
+          az staticwebapp environment delete --name pmn-test-static-web --environment-name ${{ github.event.ref }} --yes -y
       - name: 'Delete Branch'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
