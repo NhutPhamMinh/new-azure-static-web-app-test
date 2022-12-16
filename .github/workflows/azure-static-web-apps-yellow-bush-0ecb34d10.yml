@@ -44,18 +44,8 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_BUSH_0ECB34D10 }}
           action: "close"
-      - name: 'Pre Delete Branch'
-        if: github.event_name == 'delete'
-        uses: Azure/static-web-apps-deploy@v1
-        id: deletebranch
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_BUSH_0ECB34D10 }}
-          action: 'delete'
       - name: 'Delete Branch'
         if: github.event_name == 'delete'
         run: |
           echo "Delete Branch"
-          echo "GITHUB_SHA is ${{ github.sha }}"
-          echo "GITHUB_REF is ${{ github.ref }}"
-          echo "deleted branch ${{ github.event.ref }}"
-          echo "ref ${{ github.event.ref_type }}"
+          echo "deleted branch:: ${{ github.event.ref }}"
