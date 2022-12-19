@@ -60,3 +60,5 @@ jobs:
         run: |
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az staticwebapp environment list --name pmn-test-static-web
+          echo "deleting preview environment..."
+          az staticwebapp environment delete --name pmn-test-static-web --environment-name ${{ github.event.ref }} --yes -y
