@@ -50,11 +50,11 @@ jobs:
       - name: 'Pre Delete Branch'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
-          az staticwebapp environment list --name pmn-test-static-web
-          az staticwebapp environment delete --name pmn-test-static-web --environment-name ${{ github.event.ref }} --yes -y
-      - name: 'Delete Branch'
-        if: github.event_name == 'delete' && github.event.ref_type == 'branch'
-        run: |
           echo "deleted branch:: ${{ github.event.ref }}"
           echo "trying to update redirect_uris..."
           echo "removing uri: ${{ steps.builddeploy.outputs.static_web_app_url }}"
+      - name: 'Delete Branch'
+        if: github.event_name == 'delete' && github.event.ref_type == 'branch'
+        run: |
+          az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+          az staticwebapp environment list --name pmn-test-static-web
