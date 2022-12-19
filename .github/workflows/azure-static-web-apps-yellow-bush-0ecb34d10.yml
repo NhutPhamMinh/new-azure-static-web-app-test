@@ -58,7 +58,8 @@ jobs:
       - name: 'On Branch Deployment'
         if: github.event_name == 'push'
         run: |
-          echo "creating branch:: ${{ github.event.ref }}"
+          echo "github.event.ref:: ${{ github.event.ref }}"
+          echo "github.event.ref_type:: ${{ github.event.ref_type }}"
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
           echo "curent redirectUris: ${APP_AUTH_URL[@]}"
           
