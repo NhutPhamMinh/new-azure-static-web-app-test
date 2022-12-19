@@ -59,8 +59,8 @@ jobs:
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
           echo "NEW_WEB_REDIRECT_URIS=${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback" >> $GITHUB_ENV
-          echo ${APP_AUTH_URL[@]}
-          echo "${{ env.NEW_WEB_REDIRECT_URIS }}" 
+          echo "APP_AUTH_URL: ${APP_AUTH_URL[@]}"
+          echo "NEW_WEB_REDIRECT_URIS: ${{ env.NEW_WEB_REDIRECT_URIS }}" 
       - name: 'Pre Delete Branch'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
