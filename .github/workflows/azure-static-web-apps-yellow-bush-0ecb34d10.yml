@@ -60,11 +60,14 @@ jobs:
         run: |
           echo "creating branch:: ${{ github.event.ref }}"
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
+          echo "curent redirectUris: ${APP_AUTH_URL[@]}"
+          
           echo "NEW_WEB_REDIRECT_URIS=${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback" >> $GITHUB_ENV
           
           if [[ ! " ${APP_AUTH_URL[@]} " =~ "\"${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback\"" ]]; then
             APP_AUTH_URL+=("\"${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback\"")
             WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
+            echo "new redirectUris: ${APP_AUTH_URL[@]}"
             echo $WEB_REDIRECT_URIS
           else
             echo "App registration already have the web redirect uris"
