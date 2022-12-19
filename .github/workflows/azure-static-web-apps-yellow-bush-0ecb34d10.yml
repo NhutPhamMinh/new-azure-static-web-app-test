@@ -28,6 +28,7 @@ jobs:
           echo "--- event info::"
           echo "event_name:: ${{ github.event_name }}"
           echo "event action:: ${{ github.event.action }}"
+          echo "event ref type:: ${{ github.event.ref_type }}"
       - uses: actions/checkout@v2
         with:
           submodules: true
