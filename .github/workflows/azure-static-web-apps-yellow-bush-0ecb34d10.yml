@@ -1,4 +1,4 @@
-name: Azure Static Web Apps CI/CD
+name: new-azure-static-web-app-test
 
 on:
   workflow_dispatch:
@@ -11,9 +11,6 @@ on:
   delete:
     branches: 
       - "**"
-  create:
-    branches-ignore:
-      - main
 jobs:
   build_and_deploy_job:
     runs-on: ubuntu-latest
@@ -58,10 +55,20 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_BUSH_0ECB34D10 }}
           action: "close"
-      - name: 'On Create Branch'
-        if: github.event_name == 'create' && github.event.ref_type == 'branch'
+      - name: 'On Branch Deployment'
+        if: github.event_name == 'push'
         run: |
           echo "creating branch:: ${{ github.event.ref }}"
+          APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
+          echo "NEW_WEB_REDIRECT_URIS=${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback" >> $GITHUB_ENV
+          
+          if [[ ! " ${APP_AUTH_URL[@]} " =~ "\"${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback\"" ]]; then
+            APP_AUTH_URL+=("\"${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback\"")
+            WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
+            echo $WEB_REDIRECT_URIS
+          else
+            echo "App registration already have the web redirect uris"
+          fi
       - name: 'Pre Delete Branch'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
