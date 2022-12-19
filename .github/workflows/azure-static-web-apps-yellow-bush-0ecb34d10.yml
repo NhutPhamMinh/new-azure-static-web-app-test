@@ -29,6 +29,8 @@ jobs:
           echo "event_name:: ${{ github.event_name }}"
           echo "event action:: ${{ github.event.action }}"
           echo "event ref type:: ${{ github.event.ref_type }}"
+          APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
+          echo "redirectUris: ${APP_AUTH_URL[@]}"
       - uses: actions/checkout@v2
         with:
           submodules: true
