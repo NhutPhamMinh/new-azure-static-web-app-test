@@ -69,6 +69,7 @@ jobs:
             WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
             echo "new redirectUris: ${APP_AUTH_URL[@]}"
             echo $WEB_REDIRECT_URIS
+            az rest --method PATCH --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' --header Content-Type=application/json --body "{'web':{'redirectUris':[$WEB_REDIRECT_URIS]}}"
           else
             echo "App registration already have the web redirect uris"
           fi
