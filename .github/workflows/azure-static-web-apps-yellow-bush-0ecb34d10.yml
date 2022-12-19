@@ -20,6 +20,8 @@ jobs:
         run: |
           echo "Main Workflow"
           az version
+          az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+          az account show
       - uses: actions/checkout@v2
         with:
           submodules: true
