@@ -59,44 +59,44 @@ jobs:
       - name: 'On Branch Deployment'
         if: github.event_name == 'push'
         run: |
-          echo "github.event.ref:: ${{ github.event.ref }}"
-          echo "github.event.ref_type:: ${{ github.event.ref_type }}"
+          echo "- github.event.ref:: ${{ github.event.ref }}"
+          echo "- github.event.ref_type:: ${{ github.event.ref_type }}"
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
-          echo "curent redirectUris: ${APP_AUTH_URL[@]}"
+          echo "- curent redirectUris: ${APP_AUTH_URL[@]}"
           
           if [[ ! " ${APP_AUTH_URL[@]} " =~ "\"${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback\"" ]]; then
             APP_AUTH_URL+=("\"${{ steps.builddeploy.outputs.static_web_app_url }}/.auth/login/aad/callback\"")
             WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
-            echo "new redirectUris: $WEB_REDIRECT_URIS"
+            echo "- new redirectUris: $WEB_REDIRECT_URIS"
           else
-            echo "App registration already have the web redirect uris"
+            echo "- app registration already have the web redirect uris"
           fi
       - name: 'Delete Branch - Remove Callback'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
-          echo "github.event.ref:: ${{ github.event.ref }}"
-          echo "github.event.ref_type:: ${{ github.event.ref_type }}"
-          echo "removing uri: ${{ env.NEW_WEB_REDIRECT_URIS }}"
+          echo "- github.event.ref:: ${{ github.event.ref }}"
+          echo "- github.event.ref_type:: ${{ github.event.ref_type }}"
+          echo "- removing uri: ${{ env.NEW_WEB_REDIRECT_URIS }}"
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
-          echo "curent redirectUris: ${APP_AUTH_URL[@]}"
+          echo "- curent redirectUris: ${APP_AUTH_URL[@]}"
           for i in "${!APP_AUTH_URL[@]}";
           do
-            echo ${APP_AUTH_URL[$i]}
+            echo "+ checking:: ${APP_AUTH_URL[$i]}"
             if [[ "${APP_AUTH_URL[$i]}" == "\"${{ env.NEW_WEB_REDIRECT_URIS }}\"" ]];
             then
-              echo "inside"
+              echo "++ removing:: ${APP_AUTH_URL[$i]}"
               unset 'APP_AUTH_URL[i]'
               break
             fi
           done
           WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
-          echo "new redirectUris: $WEB_REDIRECT_URIS"
+          echo "- new redirectUris: $WEB_REDIRECT_URIS"
       - name: 'Delete Branch - Delete Preview Environment'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az staticwebapp environment list --name pmn-test-static-web
-          echo "deleting preview environment..."
+          echo "- deleting preview environment..."
           az staticwebapp environment delete --name pmn-test-static-web --environment-name ${{ github.event.ref }} --yes -y
