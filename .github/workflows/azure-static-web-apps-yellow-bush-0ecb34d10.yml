@@ -107,4 +107,5 @@ jobs:
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az staticwebapp environment list --name pmn-test-static-web
           echo "- deleting preview environment..."
-          az staticwebapp environment list --name pmn-test-static-web | jq '.[] | select(.sourceBranch==\"${{ github.event.ref }}\") | .buildId' 
+          buildidtest=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | select(.sourceBranch==\"${{ github.event.ref }}\") | .buildId'))
+          echo "result: $buildidtest"
