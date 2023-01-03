@@ -28,6 +28,17 @@ jobs:
           echo "event ref type:: ${{ github.event.ref_type }}"
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
           echo "redirectUris: ${APP_AUTH_URL[@]}"
+          
+          az staticwebapp environment list --name pmn-test-static-web
+          echo "- deleting preview environment..."
+          PREVIEW_ENVS=($(az staticwebapp environment list --name pmn-test-static-web | jq '.'))
+          echo "result: ${PREVIEW_ENVS[@]}"
+          for i in "${!PREVIEW_ENVS[@]}";
+          do
+            item=${PREVIEW_ENVS[$i]}
+            echo "+ checking:: $item"
+          done
+          
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -107,5 +118,10 @@ jobs:
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az staticwebapp environment list --name pmn-test-static-web
           echo "- deleting preview environment..."
-          envtest=($(az staticwebapp environment list --name pmn-test-static-web | jq '.'))
-          echo "result: ${envtest[@]}"
+          PREVIEW_ENVS=($(az staticwebapp environment list --name pmn-test-static-web | jq '.'))
+          echo "result: ${PREVIEW_ENVS[@]}"
+          for i in "${!PREVIEW_ENVS[@]}";
+          do
+            item=${PREVIEW_ENVS[$i]}
+            echo "+ checking:: $item"
+          done
