@@ -32,10 +32,11 @@ jobs:
           az staticwebapp environment list --name pmn-test-static-web
           echo "- deleting preview environment..."
           PREVIEW_ENVS=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[]'))
-          echo "result: ${PREVIEW_ENVS[@]}"
-          for item in ${PREVIEW_ENVS[@]};
-          do
-            echo "+ checking:: $item"
+          
+          len=$(echo $PREVIEW_ENVS | jq length)
+          for i in $( seq 0 $(($len - 1)) ); do
+            row=$(echo $PREVIEW_ENVS | jq .[$i])
+            echo $row
           done
           
       - uses: actions/checkout@v2
