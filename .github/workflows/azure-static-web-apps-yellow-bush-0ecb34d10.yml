@@ -31,12 +31,11 @@ jobs:
           
           az staticwebapp environment list --name pmn-test-static-web
           echo "- deleting preview environment..."
-          PREVIEW_ENVS=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[]'))
-          
-          len=$(echo $PREVIEW_ENVS | jq length)
-          for i in $( seq 0 $(($len - 1)) ); do
-            row=$(echo $PREVIEW_ENVS | jq .[$i])
-            echo $row
+          build_ids=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .buildId'))
+          source_branches=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .sourceBranch'))
+          for i in "${!build_ids[@]}";
+          do
+            echo "+ checking:: ${build_ids[$i]} - ${source_branches[$i]}"
           done
           
       - uses: actions/checkout@v2
