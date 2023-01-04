@@ -37,6 +37,7 @@ jobs:
           
           echo "- all preview envivonment..."
           az staticwebapp environment list --name pmn-test-static-web
+          
           echo "- deleting preview environment..."
           build_ids=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .buildId'))
           source_branches=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .sourceBranch'))
@@ -145,6 +146,5 @@ jobs:
               target_name=(`echo $result | awk '{print substr($0,2,length($0)-2)}'`)
               echo "++ target_name:: $target_name"
               az staticwebapp environment delete --name pmn-test-static-web --environment-name $target_name --yes -y
-              break
             fi
           done
