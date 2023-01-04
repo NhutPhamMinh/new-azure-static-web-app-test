@@ -124,10 +124,14 @@ jobs:
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az staticwebapp environment list --name pmn-test-static-web
           echo "- deleting preview environment..."
-          PREVIEW_ENVS=($(az staticwebapp environment list --name pmn-test-static-web | jq '.'))
-          echo "result: ${PREVIEW_ENVS[@]}"
-          for i in "${!PREVIEW_ENVS[@]}";
+          target_source_branch=${{ github.event.ref }}
+          echo "------------find build"
+          for i in "${!build_ids[@]}";
           do
-            item=${PREVIEW_ENVS[$i]}
-            echo "+ checking:: $item"
+            echo "+ checking:: build_id: ${build_ids[$i]} - source_branch: ${source_branches[$i]} - target_source_branch: $target_source_branch"
+            if [[ ${source_branches[$i]} == \"$target_source_branch\" ]];
+            then
+              echo "++ found:: build_id:: ${build_ids[$i]}"
+              break
+            fi
           done
