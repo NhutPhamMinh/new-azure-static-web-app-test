@@ -31,7 +31,7 @@ jobs:
           echo "+ event action:: ${{ github.event.action }}"
           echo "+ event ref type:: ${{ github.event.ref_type }}"
           
-          APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/$APPLICATION_OBJECT_ID' | jq '.web | .redirectUris[]'))
+          APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
           echo "--- redirectUris: ${APP_AUTH_URL[@]}"
           
           target_source_branch="test-001"
@@ -57,7 +57,30 @@ jobs:
               break
             fi
           done
+      - name: testing remove callback
+        run: |          
+          target_source_branch="test-abc"
+          target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname')
           
+          target_host_name=("\"https://$target_host_name/.auth/login/aad/callback\"")
+          
+          echo "- target_host_name:: $target_host_name"
+          
+          az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+          APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
+          echo "- curent redirectUris: ${APP_AUTH_URL[@]}"
+          for i in "${!APP_AUTH_URL[@]}";
+          do
+            echo "+ checking:: ${APP_AUTH_URL[$i]} - with:: $target_host_name"
+            if [[ ${APP_AUTH_URL[$i]} == $target_host_name ]];
+            then
+              echo "++ found:: removing:: ${APP_AUTH_URL[$i]}"
+              unset 'APP_AUTH_URL[i]'
+              break
+            fi
+          done
+          WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
+          echo "- new redirectUris: $WEB_REDIRECT_URIS"
       - uses: actions/checkout@v2
         with:
           submodules: true
