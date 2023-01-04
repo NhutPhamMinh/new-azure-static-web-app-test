@@ -133,7 +133,7 @@ jobs:
           echo "-- removing uri: ${{ env.NEW_WEB_REDIRECT_URIS }}"
           
           target_source_branch=${{ github.event.ref }}
-          target_host_name=$(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname'
+          target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname')
           
           target_host_name=("\"https://${{ target_host_name/.auth/login/aad/callback\"")
           
