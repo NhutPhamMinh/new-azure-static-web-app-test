@@ -134,28 +134,6 @@ jobs:
           else
             echo "- app registration already have the web redirect uris"
           fi
-      - name: 'Delete Branch New - Delete Preview Environment'
-        if: github.event_name == 'delete' && github.event.ref_type == 'branch'
-        run: |
-          az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
-          az staticwebapp environment list --name pmn-test-static-web
-          echo "- deleting preview environment..."
-          build_ids=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .buildId'))
-          source_branches=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .sourceBranch'))
-          target_source_branch=${{ github.event.ref }}
-          echo "------------find build"
-          for i in "${!build_ids[@]}";
-          do
-            echo "+ checking:: build_id: ${build_ids[$i]} - source_branch: ${source_branches[$i]} - target_source_branch: $target_source_branch"
-            if [[ ${source_branches[$i]} == \"$target_source_branch\" ]];
-            then
-              echo "++ found:: build_id:: ${build_ids[$i]}"
-              result=${build_ids[$i]}
-              target_name=(`echo $result | awk '{print substr($0,2,length($0)-2)}'`)
-              echo "++ target_name:: $target_name"
-              az staticwebapp environment delete --name pmn-test-static-web --environment-name $target_name --yes -y
-            fi
-          done
       - name: 'Delete Branch - Remove Callback'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
@@ -191,3 +169,25 @@ jobs:
           WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
           echo "- new redirectUris: $WEB_REDIRECT_URIS"
           #az rest --method PATCH --uri 'https://graph.microsoft.com/v1.0/applications/a7a6e0cc-7699-4bd0-9085-c64d8c66f562' --header Content-Type=application/json --body "{'web':{'redirectUris':[$WEB_REDIRECT_URIS]}}"
+      - name: 'Delete Branch New - Delete Preview Environment'
+        if: github.event_name == 'delete' && github.event.ref_type == 'branch'
+        run: |
+          az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+          az staticwebapp environment list --name pmn-test-static-web
+          echo "- deleting preview environment..."
+          build_ids=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .buildId'))
+          source_branches=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .sourceBranch'))
+          target_source_branch=${{ github.event.ref }}
+          echo "------------find build"
+          for i in "${!build_ids[@]}";
+          do
+            echo "+ checking:: build_id: ${build_ids[$i]} - source_branch: ${source_branches[$i]} - target_source_branch: $target_source_branch"
+            if [[ ${source_branches[$i]} == \"$target_source_branch\" ]];
+            then
+              echo "++ found:: build_id:: ${build_ids[$i]}"
+              result=${build_ids[$i]}
+              target_name=(`echo $result | awk '{print substr($0,2,length($0)-2)}'`)
+              echo "++ target_name:: $target_name"
+              az staticwebapp environment delete --name pmn-test-static-web --environment-name $target_name --yes -y
+            fi
+          done
