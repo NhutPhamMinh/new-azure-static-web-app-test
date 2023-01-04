@@ -60,7 +60,7 @@ jobs:
       - name: testing remove callback
         run: |          
           target_source_branch="test-abc"
-          target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname')
+          target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname'))
           
           echo "- target_host_name1:: $target_host_name"
           
