@@ -168,7 +168,7 @@ jobs:
           echo "- target_host_name1:: $target_host_name"
           
           # used for debug
-          target_host_name="test-yellow-bush-0ecb34d10.2.azurestaticapps.net"
+          #target_host_name="test-yellow-bush-0ecb34d10.2.azurestaticapps.net"
           echo "- target_host_name2:: $target_host_name"
           
           target_host_name=("\"https://$target_host_name/.auth/login/aad/callback\"")
