@@ -29,14 +29,17 @@ jobs:
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
           echo "redirectUris: ${APP_AUTH_URL[@]}"
           
-          echo "- testing jq..."
-          az staticwebapp environment list --name pmn-test-static-web | jq '.[] | select(.sourceBranch=="feature/test-001")'
+          target_source_branch="test-001"
           
+          echo "- testing jq... $target_source_branch"
+          az staticwebapp environment list --name pmn-test-static-web | jq '.[] | select(.sourceBranch=="$target_source_branch")'
+          
+          echo "- all preview envivonment..."
           az staticwebapp environment list --name pmn-test-static-web
           echo "- deleting preview environment..."
           build_ids=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .buildId'))
           source_branches=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .sourceBranch'))
-          target_source_branch="test-001"
+          
           echo "------------find build"
           for i in "${!build_ids[@]}";
           do
