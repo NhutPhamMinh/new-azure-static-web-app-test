@@ -32,7 +32,7 @@ jobs:
           target_source_branch="test-001"
           
           echo "- testing jq... $target_source_branch"
-          az staticwebapp environment list --name pmn-test-static-web | jq '.[] | select(.sourceBranch=="$target_source_branch")'
+          az staticwebapp environment list --name pmn-test-static-web | jq '.[] | select(.sourceBranch==\"$target_source_branch\")'
           
           echo "- all preview envivonment..."
           az staticwebapp environment list --name pmn-test-static-web
