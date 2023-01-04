@@ -152,3 +152,4 @@ jobs:
           done
           WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
           echo "- new redirectUris: $WEB_REDIRECT_URIS"
+          
