@@ -139,7 +139,8 @@ jobs:
         run: |
           echo "- github.event.ref:: ${{ github.event.ref }}"
           echo "- github.event.ref_type:: ${{ github.event.ref_type }}"
-
+          az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
+          
           target_source_branch=${{ github.event.ref }}
           target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname' --raw-output))
 
