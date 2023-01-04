@@ -57,6 +57,7 @@ jobs:
         with:
           submodules: true
       - name: Build And Deploy
+        if: github.event_name != 'delete' && github.event.ref_type != 'branch'
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
