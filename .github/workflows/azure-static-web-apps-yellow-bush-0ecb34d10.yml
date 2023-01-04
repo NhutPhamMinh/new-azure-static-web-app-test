@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: workflow info
         run: |
-          echo "--- workflow info:: $WORKFLOW_NAME"
+          #echo "--- workflow info:: $WORKFLOW_NAME"
           echo "--- subscription info::"
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az account show
