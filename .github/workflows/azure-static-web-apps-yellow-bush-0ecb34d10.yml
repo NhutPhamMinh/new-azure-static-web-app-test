@@ -124,6 +124,8 @@ jobs:
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az staticwebapp environment list --name pmn-test-static-web
           echo "- deleting preview environment..."
+          build_ids=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .buildId'))
+          source_branches=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .sourceBranch'))
           target_source_branch=${{ github.event.ref }}
           echo "------------find build"
           for i in "${!build_ids[@]}";
