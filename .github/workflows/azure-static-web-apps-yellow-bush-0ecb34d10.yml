@@ -33,9 +33,16 @@ jobs:
           echo "- deleting preview environment..."
           build_ids=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .buildId'))
           source_branches=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .sourceBranch'))
+          target_source_branch="test-001"
+          echo "------------find build"
           for i in "${!build_ids[@]}";
           do
-            echo "+ checking:: ${build_ids[$i]} - ${source_branches[$i]}"
+            echo "+ checking:: build_id: ${build_ids[$i]} - source_branch: ${source_branches[$i]} - target_source_branch: $target_source_branch"
+            if [[ ${source_branches[$i]} == \"$target_source_branch\" ]];
+            then
+              echo "++ found:: build_id:: ${build_ids[$i]}"
+              break
+            fi
           done
           
       - uses: actions/checkout@v2
