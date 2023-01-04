@@ -66,6 +66,8 @@ jobs:
           
           target_host_name=("\"https://$target_host_name/.auth/login/aad/callback\"")
           
+          target_host_name=("\"https://test-yellow-bush-0ecb34d10.2.azurestaticapps.net/.auth/login/aad/callback\"")
+          
           echo "- target_host_name:: $target_host_name"
           
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
