@@ -60,15 +60,16 @@ jobs:
       - name: testing remove callback
         run: |          
           target_source_branch="test-abc"
-          target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname'))
+          target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname' --raw-output))
           
           echo "- target_host_name1:: $target_host_name"
           
+          target_host_name="test-yellow-bush-0ecb34d10.2.azurestaticapps.net"
+          echo "- target_host_name2:: $target_host_name"
+          
           target_host_name=("\"https://$target_host_name/.auth/login/aad/callback\"")
           
-          target_host_name=("\"https://test-yellow-bush-0ecb34d10.2.azurestaticapps.net/.auth/login/aad/callback\"")
-          
-          echo "- target_host_name:: $target_host_name"
+          echo "- target_host_name3:: $target_host_name"
           
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
