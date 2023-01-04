@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: workflow info
         run: |
-          #echo "--- workflow info:: $WORKFLOW_NAME"
+          echo "--- workflow info:: $WORKFLOW_NAME"
           echo "--- subscription info::"
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az account show
@@ -151,19 +151,27 @@ jobs:
               result=${build_ids[$i]}
               target_name=(`echo $result | awk '{print substr($0,2,length($0)-2)}'`)
               echo "++ target_name:: $target_name"
+              #az staticwebapp environment delete --name pmn-test-static-web --environment-name $target_name --yes -y
             fi
           done
       - name: 'Delete Branch - Remove Callback'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
-          echo "-- github.event.ref:: ${{ github.event.ref }}"
-          echo "-- github.event.ref_type:: ${{ github.event.ref_type }}"
-          echo "-- removing uri: ${{ env.NEW_WEB_REDIRECT_URIS }}"
-          
+          echo "- github.event.ref:: ${{ github.event.ref }}"
+          echo "- github.event.ref_type:: ${{ github.event.ref_type }}"
+
           target_source_branch=${{ github.event.ref }}
-          target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname')
+          target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname' --raw-output))
+
+          echo "- target_host_name1:: $target_host_name"
+          
+          # used for debug
+          target_host_name="test-yellow-bush-0ecb34d10.2.azurestaticapps.net"
+          echo "- target_host_name2:: $target_host_name"
           
           target_host_name=("\"https://$target_host_name/.auth/login/aad/callback\"")
+
+          echo "- removing uri: $target_host_name"
           
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
@@ -180,3 +188,4 @@ jobs:
           done
           WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
           echo "- new redirectUris: $WEB_REDIRECT_URIS"
+          #az rest --method PATCH --uri 'https://graph.microsoft.com/v1.0/applications/a7a6e0cc-7699-4bd0-9085-c64d8c66f562' --header Content-Type=application/json --body "{'web':{'redirectUris':[$WEB_REDIRECT_URIS]}}"
