@@ -32,8 +32,9 @@ jobs:
           target_source_branch="test-001"
           
           echo "- testing jq... $target_source_branch"
-          az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .name'
-          
+          test_filter=$(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .name' --raw-output)
+          echo $test_filter
+
           echo "- all preview envivonment..."
           az staticwebapp environment list --name pmn-test-static-web
           echo "- deleting preview environment..."
