@@ -140,7 +140,10 @@ jobs:
             if [[ ${source_branches[$i]} == \"$target_source_branch\" ]];
             then
               echo "++ found:: build_id:: ${build_ids[$i]}"
-              az staticwebapp environment delete --name pmn-test-static-web --environment-name ${build_ids[$i]} --yes -y
+              result=${build_ids[$i]}
+              target_name=(`echo $result | awk '{print substr($0,2,length($0)-2)}'`)
+              echo "++ target_name:: $target_name"
+              az staticwebapp environment delete --name pmn-test-static-web --environment-name $target_name --yes -y
               break
             fi
           done
