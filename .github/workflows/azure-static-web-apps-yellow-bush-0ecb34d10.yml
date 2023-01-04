@@ -21,6 +21,7 @@ jobs:
     name: Build and Deploy Job
     steps:
       - name: workflow info
+        if: false
         run: |
           echo "--- workflow info:: $WORKFLOW_NAME"
           echo "--- subscription info::"
@@ -58,6 +59,7 @@ jobs:
             fi
           done
       - name: testing remove callback
+        if: false
         run: |          
           target_source_branch="test-abc"
           target_host_name=($(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname' --raw-output))
@@ -151,7 +153,7 @@ jobs:
               result=${build_ids[$i]}
               target_name=(`echo $result | awk '{print substr($0,2,length($0)-2)}'`)
               echo "++ target_name:: $target_name"
-              #az staticwebapp environment delete --name pmn-test-static-web --environment-name $target_name --yes -y
+              az staticwebapp environment delete --name pmn-test-static-web --environment-name $target_name --yes -y
             fi
           done
       - name: 'Delete Branch - Remove Callback'
