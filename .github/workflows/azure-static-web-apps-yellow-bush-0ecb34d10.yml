@@ -14,20 +14,25 @@ on:
 jobs:
   build_and_deploy_job:
     runs-on: ubuntu-latest
+    env:
+      WORKFLOW_NAME: main1
+      STATIC_WEB_APP_NAME: pmn-test-static-web
+      APPLICATION_OBJECT_ID: da2a6e83-bee5-4764-8a00-0939678a5829
     name: Build and Deploy Job
     steps:
       - name: workflow info
         run: |
-          echo "--- workflow info:: main"
+          echo "--- workflow info:: $WORKFLOW_NAME"
           echo "--- subscription info::"
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           az account show
           echo "--- event info::"
-          echo "event_name:: ${{ github.event_name }}"
-          echo "event action:: ${{ github.event.action }}"
-          echo "event ref type:: ${{ github.event.ref_type }}"
-          APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
-          echo "redirectUris: ${APP_AUTH_URL[@]}"
+          echo "+ event_name:: ${{ github.event_name }}"
+          echo "+ event action:: ${{ github.event.action }}"
+          echo "+ event ref type:: ${{ github.event.ref_type }}"
+          
+          APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/$APPLICATION_OBJECT_ID' | jq '.web | .redirectUris[]'))
+          echo "--- redirectUris: ${APP_AUTH_URL[@]}"
           
           target_source_branch="test-001"
           
@@ -35,10 +40,10 @@ jobs:
           test_filter=$(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .name' --raw-output)
           echo $test_filter
           
-          echo "- all preview envivonment..."
+          echo "--- all preview envivonment..."
           az staticwebapp environment list --name pmn-test-static-web
           
-          echo "- deleting preview environment..."
+          echo "--- deleting preview environment..."
           build_ids=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .buildId'))
           source_branches=($(az staticwebapp environment list --name pmn-test-static-web | jq '.[] | .sourceBranch'))
           
