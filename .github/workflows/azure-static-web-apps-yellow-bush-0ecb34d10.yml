@@ -123,34 +123,32 @@ jobs:
               result=${build_ids[$i]}
               target_name=(`echo $result | awk '{print substr($0,2,length($0)-2)}'`)
               echo "++ target_name:: $target_name"
-              az staticwebapp environment delete --name pmn-test-static-web --environment-name $target_name --yes -y
             fi
           done
       - name: 'Delete Branch - Remove Callback'
         if: github.event_name == 'delete' && github.event.ref_type == 'branch'
         run: |
-          echo "- github.event.ref:: ${{ github.event.ref }}"
-          echo "- github.event.ref_type:: ${{ github.event.ref_type }}"
-          echo "- removing uri: ${{ env.NEW_WEB_REDIRECT_URIS }}"
+          echo "-- github.event.ref:: ${{ github.event.ref }}"
+          echo "-- github.event.ref_type:: ${{ github.event.ref_type }}"
+          echo "-- removing uri: ${{ env.NEW_WEB_REDIRECT_URIS }}"
+          
+          target_source_branch=${{ github.event.ref }}
+          target_host_name=$(az staticwebapp environment list --name pmn-test-static-web | jq --arg sb $target_source_branch '.[] | select(.sourceBranch==$sb) | .hostname'
+          
+          target_host_name=("\"https://${{ target_host_name/.auth/login/aad/callback\"")
+          
           az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
           APP_AUTH_URL=($(az rest --method GET --uri 'https://graph.microsoft.com/v1.0/applications/da2a6e83-bee5-4764-8a00-0939678a5829' | jq '.web | .redirectUris[]'))
           echo "- curent redirectUris: ${APP_AUTH_URL[@]}"
           for i in "${!APP_AUTH_URL[@]}";
           do
-            echo "+ checking:: ${APP_AUTH_URL[$i]}"
-            if [[ "${APP_AUTH_URL[$i]}" == "\"${{ env.NEW_WEB_REDIRECT_URIS }}\"" ]];
+            echo "+ checking:: ${APP_AUTH_URL[$i]} - with:: $target_host_name"
+            if [[ ${APP_AUTH_URL[$i]} == $target_host_name ]];
             then
-              echo "++ removing:: ${APP_AUTH_URL[$i]}"
+              echo "++ found:: removing:: ${APP_AUTH_URL[$i]}"
               unset 'APP_AUTH_URL[i]'
               break
             fi
           done
           WEB_REDIRECT_URIS=`echo $(echo ${APP_AUTH_URL[@]}) | tr ' ' ','`
           echo "- new redirectUris: $WEB_REDIRECT_URIS"
-      - name: 'Delete Branch - Delete Preview Environment'
-        if: github.event_name == 'delete_skip' && github.event.ref_type == 'branch'
-        run: |
-          az login --service-principal -u ${{ secrets.CLIENT_ID }} -p ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
-          az staticwebapp environment list --name pmn-test-static-web
-          echo "- deleting preview environment..."
-          az staticwebapp environment delete --name pmn-test-static-web --environment-name ${{ github.event.ref }} --yes -y
