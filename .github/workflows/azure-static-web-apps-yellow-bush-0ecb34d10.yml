@@ -104,8 +104,8 @@ jobs:
           app_location: "/" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "" # Built app content directory - optional
-          production_branch: "main"
-          #deployment_environment: "mytestenv"
+          #production_branch: "main"
+          deployment_environment: "mytestenv"
           ###### End of Repository/Build Configurations ######
       - name: Static Webapp Url
         run: |
